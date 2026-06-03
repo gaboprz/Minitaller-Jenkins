@@ -1,0 +1,17 @@
+services:
+  develop:
+    build:
+      context: .
+      target: develop
+    environment:
+      DISPLAY: ${DISPLAY}
+    volumes:
+      - .:/app
+      - /tmp/.X11-unix:/tmp/.X11-unix
+    command: python buscaminas.py
+
+  unit-test:
+    build:
+      context: .
+      target: unit-test
+    command: python -m unittest discover -s tests
