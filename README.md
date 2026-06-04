@@ -46,3 +46,6 @@ Tambien se puede usar Compose:
 docker compose run --rm unit-test
 docker compose run --rm develop
 ```
+## Demo CI/CD
+
+Este cambio se usa para probar que Jenkins ejecuta el pipeline automaticamente.
