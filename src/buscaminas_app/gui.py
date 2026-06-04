@@ -204,7 +204,9 @@ class MinesweeperApp:
             if is_mine(self.board, position):
                 button.config(command=lambda r=position[0], c=position[1]: self.explode(r, c))
             else:
-                button.config(command=lambda r=position[0], c=position[1]: self.reveal(r, c, difficulty))
+                button.config(
+                    command=lambda r=position[0], c=position[1]: self.reveal(r, c, difficulty)
+                )
 
         tk.Label(self.root, text="Segundos transcurridos: ").place(x=80, y=20)
         tk.Label(self.root, textvariable=self.elapsed_seconds).place(x=250, y=20)

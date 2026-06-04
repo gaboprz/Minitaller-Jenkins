@@ -1,4 +1,18 @@
 services:
+  jenkins:
+    build:
+      context: .
+      dockerfile: jenkins-local.Dockerfile
+    container_name: jenkins-minitaller
+    user: root
+    ports:
+      - "8081:8080"
+      - "50000:50000"
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - .:/workspace/Minitaller-Jenkins
+
   develop:
     build:
       context: .
@@ -15,3 +29,6 @@ services:
       context: .
       target: unit-test
     command: python -m unittest discover -s tests
+
+volumes:
+  jenkins_home:

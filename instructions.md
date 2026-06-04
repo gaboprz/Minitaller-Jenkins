@@ -79,17 +79,23 @@ configurado el servidor grafico del sistema anfitrion.
 
 ## Pipeline con Jenkins
 
-El archivo `Jenkinsfile` define tres etapas:
+El archivo `Jenkinsfile` define un Pipeline Declarativo con `agent none` global y
+agentes por etapa:
 
-1. Construir la imagen de pruebas con el target `unit-test`.
-2. Ejecutar las pruebas unitarias dentro del contenedor.
-3. Construir la imagen de desarrollo con el target `develop`.
+1. `Checkout`: descarga el codigo con `checkout scm` y lo guarda con `stash`.
+2. `Static Analysis`: construye el target Docker `lint` y ejecuta `flake8`.
+3. `Unit Tests`: construye el target Docker `unit-test` y ejecuta `pytest`.
+4. `Build App Image`: construye la imagen Docker de desarrollo `buscaminas-develop`.
 
 Flujo esperado:
 
 ```text
-Codigo -> Jenkins -> Docker build unit-test -> Unit tests -> Docker build develop
+Repo Git -> checkout scm -> Docker lint -> Docker pytest + JUnit XML -> Docker develop
 ```
+
+Los tests generan el archivo `reports/unit-tests.xml` dentro del contenedor.
+Jenkins lo copia al workspace y lo procesa con `junit` en el bloque `post`, lo
+que permite ver resultados y tendencias desde la interfaz.
 
 ## Razon de la modularizacion
 
@@ -106,11 +112,76 @@ Ahora la logica importante esta separada:
 Esto permite aplicar CI/CD de forma mas limpia y facilita agregar nuevas pruebas
 sin tocar la interfaz grafica.
 
+## Primera prueba local con Jenkins
+
+Esta opcion levanta Jenkins dentro de Docker para hacer una prueba rapida del
+pipeline en una computadora local.
+
+1. Construir y levantar Jenkins:
+
+```bash
+docker compose up -d jenkins
+```
+
+2. Obtener la contrasena inicial:
+
+```bash
+docker compose logs jenkins
+```
+
+Busca una linea parecida a:
+
+```text
+Please use the following password to proceed to installation:
+```
+
+3. Abrir Jenkins en el navegador:
+
+```text
+http://localhost:8081
+```
+
+4. Instalar los plugins sugeridos por Jenkins.
+
+5. Crear el primer usuario administrador.
+
+6. Crear un nuevo job:
+
+- Seleccionar `New Item`.
+- Nombre sugerido: `buscaminas-pipeline`.
+- Tipo: `Pipeline`.
+- Seleccionar `OK`.
+
+7. En la seccion `Pipeline`, seleccionar `Pipeline script from SCM`.
+
+8. Configurar el repositorio Git del proyecto.
+
+9. En `Script Path`, dejar:
+
+```text
+Jenkinsfile
+```
+
+10. Guardar y ejecutar con `Build Now`.
+
+Si todo esta correcto, Jenkins debe mostrar las etapas en verde y una seccion de
+resultados de pruebas publicada por JUnit.
+
+Para una prueba manual rapida sin Git remoto, tambien se puede crear un job tipo
+`Pipeline` y pegar el contenido del `Jenkinsfile`, pero esa opcion no deja el
+pipeline versionado junto al codigo.
+
 ## Comandos utiles
 
 ```bash
 PYTHONPATH=src python3 -m unittest discover -s tests
+python3 -m pip install -r requirements-dev.txt
+flake8 .
+pytest tests/test_domain.py tests/test_ranking.py --junitxml=reports/unit-tests.xml
 docker build --target unit-test -t buscaminas-unit-test .
 docker run --rm buscaminas-unit-test
+docker build --target lint -t buscaminas-ci-lint .
+docker run --rm buscaminas-ci-lint
 docker build --target develop -t buscaminas-develop .
+docker compose up -d jenkins
 ```

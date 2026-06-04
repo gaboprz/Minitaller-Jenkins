@@ -7,8 +7,12 @@ SRC = ROOT / "src"
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from buscaminas_app.gui import main
+
+def run() -> None:
+    from buscaminas_app.gui import main
+
+    main()
 
 
 if __name__ == "__main__":
-    main()
+    run()
