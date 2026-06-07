@@ -93,7 +93,7 @@ http://localhost:8081
 ```bash
 docker compose logs jenkins
 ```
-
+![Password](img/psswrd.png)
 ### 5. Configurar Jenkins
 
 En el asistente inicial:
