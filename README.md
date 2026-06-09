@@ -1,7 +1,7 @@
 # Minitaller-Jenkins
 
 Material de apoyo para un mini-taller tecnico enfocado en el uso de Jenkins como
-herramienta de automatizacion para procesos de integracion y entrega continua.
+herramienta de automatizacion para procesos de integracion y entrega continua
 
 ## Estructura
 
