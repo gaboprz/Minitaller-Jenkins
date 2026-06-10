@@ -10,7 +10,7 @@ class BoardGenerationTests(unittest.TestCase):
 
         mine_count = sum(cell == MINE for row in board for cell in row)
 
-        self.assertEqual(mine_count, 99)
+        self.assertEqual(mine_count, 10)
         self.assertNotEqual(board[3][3], MINE)
         self.assertNotEqual(board[2][3], MINE)
         self.assertNotEqual(board[3][2], MINE)
